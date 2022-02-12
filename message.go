@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// MessageContext is a context.MessageContext wrapper that is intended to include some extra
+// MessageContext is a context.Context wrapper that is intended to include some extra
 // metadata about which context was cancelled. Useful for distinguishing e.g.
 // http request cancellation vs deadline vs process sigterm handling.
 type MessageContext struct {
@@ -23,7 +23,8 @@ func (c MessageContext) Err() error {
 
 var _ context.Context = MessageContext{}
 
-// With is a helper for creating an extended Context instance.
+// WithMessage is a helper for creating a MessageContext instance, with more
+// context about exactly which context cancellation occurred.
 func WithMessage(ctx context.Context, format string, args ...interface{}) context.Context {
 	return MessageContext{
 		Context: ctx,
@@ -38,7 +39,8 @@ type MessageError struct {
 	Original error
 }
 
-// Print out the message plus the metadata about which context was cancelled.
+// Error implements error and prints out the message plus the metadata about
+// which context was cancelled.
 func (c *MessageError) Error() string {
 	return fmt.Sprintf("%s context error: %s", c.Message, c.Original)
 }

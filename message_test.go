@@ -13,7 +13,7 @@ func TestMore(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 	defer cancel()
 
-	ctx = With(ctx, "my test context")
+	ctx = WithMessage(ctx, "my test context")
 	<-ctx.Done()
 	asrt.Contains(ctx.Err().Error(), "my test context")
 }

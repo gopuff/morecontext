@@ -1,6 +1,6 @@
-module github.com/gopuff/more
+module github.com/gopuff/morecontext
 
-go 1.18
+go 1.17
 
 require github.com/alecthomas/assert v1.0.0
 
