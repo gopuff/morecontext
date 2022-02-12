@@ -42,7 +42,7 @@ type MessageError struct {
 // Error implements error and prints out the message plus the metadata about
 // which context was cancelled.
 func (c *MessageError) Error() string {
-	return fmt.Sprintf("%s context error: %s", c.Message, c.Original)
+	return fmt.Sprintf("%s: %s", c.Message, c.Original)
 }
 
 // Unwrap supports errors.Is/errors.As
