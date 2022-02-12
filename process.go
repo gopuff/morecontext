@@ -9,7 +9,8 @@ import (
 	"syscall"
 )
 
-// sigCtx is a context that includes details
+// sigCtx is a context that will be cancelled if certain signals are received.
+// Its Err will include details if this is the reason it was cancelled.
 type sigCtx struct {
 	context.Context
 
@@ -25,14 +26,15 @@ func (sc *sigCtx) Err() error {
 	err := sc.Context.Err()
 
 	return &MessageError{
-		Message:  fmt.Sprintf("process exiting after getting signal %s", sc.exitSignal),
+		Message:  fmt.Sprintf("context cancelled: got signal %s", sc.exitSignal.String()),
 		Original: err,
 	}
 }
 
-// Process returns a context.Context that will be Done if the given signals (or
-// SIGTERM and SIGINT if none are passed) are received by the process.
-func Process(sigs ...os.Signal) context.Context {
+// ForSignals returns a context.Context that will be cancelled if the given
+// signals (or SIGTERM and SIGINT by default, if none are passed) are received
+// by the process.
+func ForSignals(sigs ...os.Signal) context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// If no signals are returnd we will use a sensible default set.
@@ -42,9 +44,10 @@ func Process(sigs ...os.Signal) context.Context {
 
 	sc := &sigCtx{Context: ctx}
 
+	ch := make(chan os.Signal, 2)
+	signal.Notify(ch, sigs...)
+
 	go func() {
-		ch := make(chan os.Signal, 2)
-		signal.Notify(ch, sigs...)
 
 		i := 0
 		for sig := range ch {
