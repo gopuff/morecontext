@@ -5,55 +5,65 @@
 
 ## Usage
 
-#### func  With
+#### func  Process
 
 ```go
-func With(ctx context.Context, format string, args ...interface{}) context.Context
+func Process(sigs ...os.Signal) context.Context
 ```
-With is a helper for creating an extended Context instance.
+Process returns a context.Context that will be Done if the given signals (or
+SIGTERM and SIGINT if none are passed) are received by the process.
 
-#### type Context
+#### func  WithMessage
 
 ```go
-type Context struct {
+func WithMessage(ctx context.Context, format string, args ...interface{}) context.Context
+```
+WithMessage is a helper for creating a MessageContext instance, with more
+context about exactly which context cancellation occurred.
+
+#### type MessageContext
+
+```go
+type MessageContext struct {
 	context.Context
 	Message string
 }
 ```
 
-Context is a context.Context wrapper that is intended to include some extra
-metadata about which context was cancelled. Useful for distinguishing e.g. http
-request cancellation vs deadline vs process sigterm handling.
+MessageContext is a context.Context wrapper that is intended to include some
+extra metadata about which context was cancelled. Useful for distinguishing e.g.
+http request cancellation vs deadline vs process sigterm handling.
 
-#### func (Context) Err
+#### func (MessageContext) Err
 
 ```go
-func (c Context) Err() error
+func (c MessageContext) Err() error
 ```
 Err returns an error with extra context messaging
 
-#### type CtxError
+#### type MessageError
 
 ```go
-type CtxError struct {
+type MessageError struct {
 	Message  string
 	Original error
 }
 ```
 
-CtxError implements error but separates the message from the original error in
-case you want it.
+MessageError implements error but separates the message from the original error
+in case you want it.
 
-#### func (*CtxError) Error
+#### func (*MessageError) Error
 
 ```go
-func (c *CtxError) Error() string
+func (c *MessageError) Error() string
 ```
-Print out the message plus the metadata about which context was cancelled.
+Error implements error and prints out the message plus the metadata about which
+context was cancelled.
 
-#### func (*CtxError) Unwrap
+#### func (*MessageError) Unwrap
 
 ```go
-func (c *CtxError) Unwrap() error
+func (c *MessageError) Unwrap() error
 ```
 Unwrap supports errors.Is/errors.As
