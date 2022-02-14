@@ -1,17 +1,21 @@
 # morecontext
+
+context.Context helpers to make your life slightly easier.
+
 --
     import "github.com/gopuff/morecontext"
 
 
 ## Usage
 
-#### func  Process
+#### func  ForSignals
 
 ```go
-func Process(sigs ...os.Signal) context.Context
+func ForSignals(sigs ...os.Signal) context.Context
 ```
-Process returns a context.Context that will be Done if the given signals (or
-SIGTERM and SIGINT if none are passed) are received by the process.
+ForSignals returns a context.Context that will be cancelled if the given signals
+(or SIGTERM and SIGINT by default, if none are passed) are received by the
+process.
 
 #### func  WithMessage
 
