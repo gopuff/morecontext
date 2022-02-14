@@ -1,4 +1,7 @@
 # morecontext
+
+context.Context helpers to make your life slightly easier.
+
 --
     import "github.com/gopuff/morecontext"
 
