@@ -25,6 +25,10 @@ func (sc *sigCtx) Err() error {
 	defer sc.m.Unlock()
 	err := sc.Context.Err()
 
+	if sc.exitSignal == nil {
+		return nil
+	}
+
 	return &MessageError{
 		Message:  fmt.Sprintf("context cancelled: got signal %s", sc.exitSignal.String()),
 		Original: err,
